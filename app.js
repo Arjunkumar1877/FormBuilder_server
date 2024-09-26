@@ -30,7 +30,7 @@ class App {
   }
 
   initializeMiddleware() {
-    const allowedOrigins = ['https://form-builder-olive-nine.vercel.app/'];
+    const allowedOrigins = ['https://form-builder-olive-nine.vercel.app'];
 
     this.app.use(cors({
       origin: allowedOrigins,
