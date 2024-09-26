@@ -19,7 +19,6 @@ class App {
     this.initializeErrorHandling();
   }
 
-  // Method to connect to MongoDB
   connectToDatabase() {
     mongoose.connect(process.env.MONGO_URI)
       .then(() => {

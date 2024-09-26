@@ -18,4 +18,6 @@ router.get('/get_responses/:formId', userController.getResponses);
 
 router.post('/delete_form/:formId', userController.deleteForm);
 
-export default routeraaaaa
+router.post("/google_oauth", userController.googleOuth);
+
+export default router;

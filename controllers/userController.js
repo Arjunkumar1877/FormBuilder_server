@@ -206,6 +206,65 @@ class UserController {
     }
   }
 
+  googleOuth = async (req, res) => {
+    try {
+      const { email, name } = req.body;
+  
+      if (!email) {
+        return res.status(400).json({
+          message: "Email is required",
+          success: false,
+        });
+      }
+  
+      const user = await UserModel.findOne({ email });
+  
+      if (user) {
+        const userData = {
+          _id: user._id,
+          email: user.email,
+          name: user.name,
+        };
+  
+        return res.status(200).json({
+          message: "Successfully logged in",
+          success: true,
+          data: userData,
+        });
+      } else {
+        const newUser = await UserModel.create(req.body);
+  
+        if (newUser) {
+          const userData = {
+            _id: newUser._id,
+            email: newUser.email,
+            name: newUser.name,
+          };
+  
+          return res.status(201).json({
+            message: "Successfully registered and logged in",
+            success: true,
+            data: userData,
+          });
+        } else {
+          return res.status(500).json({
+            message: "Failed to register the user",
+            success: false,
+          });
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        message: "Internal server error",
+        success: false,
+        error: error.message,
+      });
+    }
+  };
+  
+  
+
 }
 
 export const userController = new UserController();
