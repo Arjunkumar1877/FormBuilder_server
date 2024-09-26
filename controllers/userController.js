@@ -96,7 +96,7 @@ class UserController {
 
   saveForm = async (req, res) => {
     try {
-      console.log(req.body)
+      console.log(req.body);
       const { creatorId, title, fields } = req.body;
 
       if (!creatorId || !title || !fields || fields.length === 0) {
@@ -133,99 +133,123 @@ class UserController {
     try {
       const { creatorId, formId } = req.params;
       const form = await FormModel.findOne({ _id: formId, creatorId });
-  
+
       if (!form) {
-        return res.status(404).json({ message: 'Form not found' });
+        return res.status(404).json({ message: "Form not found" });
       }
-  
+
       return res.json(form);
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ message: 'Server error' });
+      return res.status(500).json({ message: "Server error" });
     }
-  }
-  
+  };
+
   getAllForms = async (req, res) => {
     try {
       const { creatorId } = req.params;
       const form = await FormModel.find({ creatorId });
-  
+
       if (!form) {
-        return res.status(404).json({ message: 'Form not found', success: false });
+        return res
+          .status(404)
+          .json({ message: "Form not found", success: false });
       }
-  
-      return res.status(200).json({message: "data successfully fetched", data: form, success: true});
+
+      return res
+        .status(200)
+        .json({
+          message: "data successfully fetched",
+          data: form,
+          success: true,
+        });
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ message: 'Server error' });
+      return res.status(500).json({ message: "Server error" });
     }
-  }
+  };
 
   addResponse = async (req, res) => {
-  try {
+    try {
+      console.log(req.body);
+      const { formId, responses } = req.body;
 
-    console.log(req.body)
-    const { formId, responses } = req.body;
+      if (!formId || !responses) {
+        return res
+          .status(400)
+          .json({ message: "Form ID and responses are required." });
+      }
 
-    if (!formId || !responses) {
-      return res.status(400).json({ message: 'Form ID and responses are required.' });
+      const newResponse = new UserResponse({ formId, responses });
+
+      await newResponse.save();
+
+      res
+        .status(201)
+        .json({
+          message: "Response saved successfully",
+          response: newResponse,
+          success: true,
+        });
+    } catch (error) {
+      console.error("Error saving response:", error);
+      res
+        .status(500)
+        .json({ message: "An error occurred while saving the response" });
     }
-
-    const newResponse = new UserResponse({ formId, responses });
-
-    await newResponse.save();
-
-    res.status(201).json({ message: 'Response saved successfully', response: newResponse, success: true });
-  } catch (error) {
-    console.error('Error saving response:', error);
-    res.status(500).json({ message: 'An error occurred while saving the response' });
-  }
   };
 
   getResponses = async (req, res) => {
-    const {formId}  = req.params;
-  
-    console.log(req.params)
-    try {
-      const result = await UserResponse.find({formId: formId}) // Make sure this function is defined
-      return res.status(201).json({ message: 'all respons', data: result });
-    } catch (error) {
-      console.error('Error adding response:', error);
-      return res.status(500).json({ message: 'An error occurred while adding response', error: error.message });
-    }
-  }
+    const { formId } = req.params;
 
-  deleteForm = async(req, res)=>{
+    console.log(req.params);
     try {
-      const deleteForm = await FormModel.findOneAndDelete({_id: req.params.formId})
-      if(deleteForm){
-        res.json({message: "deleted succesfully", success: true})
+      const result = await UserResponse.find({ formId: formId }); // Make sure this function is defined
+      return res.status(201).json({ message: "all respons", data: result });
+    } catch (error) {
+      console.error("Error adding response:", error);
+      return res
+        .status(500)
+        .json({
+          message: "An error occurred while adding response",
+          error: error.message,
+        });
+    }
+  };
+
+  deleteForm = async (req, res) => {
+    try {
+      const deleteForm = await FormModel.findOneAndDelete({
+        _id: req.params.formId,
+      });
+      if (deleteForm) {
+        res.json({ message: "deleted succesfully", success: true });
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   googleOuth = async (req, res) => {
     try {
       const { email, name } = req.body;
-  
+
       if (!email) {
         return res.status(400).json({
           message: "Email is required",
           success: false,
         });
       }
-  
+
       const user = await UserModel.findOne({ email });
-  
+
       if (user) {
         const userData = {
           _id: user._id,
           email: user.email,
           name: user.name,
         };
-  
+
         return res.status(200).json({
           message: "Successfully logged in",
           success: true,
@@ -233,14 +257,14 @@ class UserController {
         });
       } else {
         const newUser = await UserModel.create(req.body);
-  
+
         if (newUser) {
           const userData = {
             _id: newUser._id,
             email: newUser.email,
             name: newUser.name,
           };
-  
+
           return res.status(201).json({
             message: "Successfully registered and logged in",
             success: true,
@@ -262,9 +286,6 @@ class UserController {
       });
     }
   };
-  
-  
-
 }
 
 export const userController = new UserController();

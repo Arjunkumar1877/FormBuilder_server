@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import userRouter from './routes/userRoute.js'
+import userRouter from './routes/userRoute.js';
 import cors from 'cors';
 
 dotenv.config();
@@ -29,21 +29,25 @@ class App {
       });
   }
 
-  // Method to initialize middleware
   initializeMiddleware() {
-    this.app.use(cors())
+    const allowedOrigins = ['https://form-builder-olive-nine.vercel.app/'];
+
+    this.app.use(cors({
+      origin: allowedOrigins,
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      credentials: true, 
+    }));
+    
     this.app.use(logger('dev'));
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
     this.app.use(cookieParser());
   }
 
-  // Method to initialize routes
   initializeRoutes() {
     this.app.use('/user', userRouter);
   }
 
-  // Method to initialize error handling
   initializeErrorHandling() {
     this.app.use((req, res, next) => {
       next(createError(404));
@@ -53,13 +57,10 @@ class App {
       res.locals.message = err.message;
       res.locals.error = req.app.get('env') === 'development' ? err : {};
       
-      // render the error page
       res.status(err.status || 500);
       res.render('error');
     });
   }
-
-  // Method to start the 
 
   listen() {
     this.app.listen(this.port, () => {
@@ -68,8 +69,7 @@ class App {
   }
 }
 
-// Create an instance of the App class and listen on the specified port
 const appInstance = new App();
 appInstance.listen();
 
-export default appInstance.app; // Exporting the app instance for use in other modules
+export default appInstance.app; 
