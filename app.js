@@ -35,9 +35,9 @@ class App {
     this.app.use(cors({
       origin: allowedOrigins,
       methods: ['GET', 'POST', 'PUT', 'DELETE'],
-      credentials: true, 
+      credentials: true,
     }));
-    
+
     this.app.use(logger('dev'));
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
@@ -49,16 +49,22 @@ class App {
   }
 
   initializeErrorHandling() {
+    // Handle 404
     this.app.use((req, res, next) => {
       next(createError(404));
     });
 
+    // Error handler
     this.app.use((err, req, res, next) => {
       res.locals.message = err.message;
       res.locals.error = req.app.get('env') === 'development' ? err : {};
-      
+
+      // Respond with JSON instead of rendering a view
       res.status(err.status || 500);
-      res.render('error');
+      res.json({
+        message: err.message,
+        error: req.app.get('env') === 'development' ? err : {},
+      });
     });
   }
 
@@ -72,4 +78,4 @@ class App {
 const appInstance = new App();
 appInstance.listen();
 
-export default appInstance.app; 
+export default appInstance.app;
